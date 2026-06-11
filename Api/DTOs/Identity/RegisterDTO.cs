@@ -13,7 +13,5 @@ namespace API.DTOs.Identity
         public string PhoneNumber { set; get; }
         [Required]
         public string Password { set; get; }
-        [Required]
-        public string UserType { get; set; }
     }
 }

@@ -6,7 +6,8 @@ using Core.Enums;
 using Core.Services.Contract;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc; 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Extensions;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -48,15 +49,12 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO model)
         {
-            if (!Enum.TryParse(model.UserType, out UserType userType))
-                return BadRequest("Invalid user type");
-
             var user = new AppUser
             {
                 DisplayName = model.DisplayName,
                 Email = model.Email,
                 UserName = model.Email.Split('@')[0],
-                UserType = userType
+                UserType = UserType.User
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -115,5 +113,6 @@ namespace API.Controllers
 
             return Ok();
         }
+
     }
 }

@@ -63,22 +63,27 @@ namespace API
                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter())
                 );
 
-            builder.Services.AddEndpointsApiExplorer();
-
+            builder.Services.AddEndpointsApiExplorer();  
             builder.Services.AddSwaggerGen(options =>
             {
-                options.UseInlineDefinitionsForEnums();
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "My API",
+                    Version = "v1"
+                });
 
+                // ?? JWT Auth Definition
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Enter: Bearer {your token here}"
+                    Description = "Enter JWT like this: Bearer {your token}"
                 });
 
+                // ?? Global Security Requirement
                 options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -90,11 +95,10 @@ namespace API
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            new string[] {}
         }
     });
             });
-
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -112,7 +116,7 @@ namespace API
             var dbContext = services.GetRequiredService<StoreContext>();
             var identityDbContext = services.GetRequiredService<AppIdentityDbContext>();
             var userManager = services.GetRequiredService<UserManager<AppUser>>();
-            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>(); 
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             try
@@ -134,7 +138,11 @@ namespace API
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API v1");
+                    c.DocumentTitle = "My API Documentation";
+                });
             }
 
             app.UseStatusCodePagesWithReExecute("/Errors/{0}");

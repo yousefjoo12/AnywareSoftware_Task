@@ -1,6 +1,8 @@
-﻿using API.DTOs; 
+﻿using API.DTOs;
+using API.DTOs.Identity;
 using AutoMapper;
 using Core.Entities;
+using Core.Entities.Identity;
 
 namespace API.Helpers
 {
@@ -8,8 +10,7 @@ namespace API.Helpers
     {
         public MappingProfiles()
         {
-          
-
+            CreateMap<AppUser, UserResponseDTO>(); 
         }
     }
 }

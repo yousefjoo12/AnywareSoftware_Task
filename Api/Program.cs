@@ -1,11 +1,12 @@
 using API.Extensions;
 using API.MiddleWare;
-using Core.Entities.Identity; 
+using Core.Entities.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity; 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens; 
-using Project.Repository.Data.Identity; 
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Project.Repository.Data.Identity;
 using Repository.Data;
 using Repository.Data.Identity;
 using StackExchange.Redis;
@@ -63,7 +64,36 @@ namespace API
                 );
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(c => c.UseInlineDefinitionsForEnums());
+
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.UseInlineDefinitionsForEnums();
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter: Bearer {your token here}"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+            });
 
             builder.Services.AddCors(options =>
             {
@@ -82,6 +112,7 @@ namespace API
             var dbContext = services.GetRequiredService<StoreContext>();
             var identityDbContext = services.GetRequiredService<AppIdentityDbContext>();
             var userManager = services.GetRequiredService<UserManager<AppUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
             try
@@ -89,7 +120,7 @@ namespace API
                 await dbContext.Database.MigrateAsync();
                 await identityDbContext.Database.MigrateAsync();
                 await StoreContextSeed.SeedAsync(dbContext);
-                await AppIdentityDbContextSeed.SeedUserAsync(userManager);
+                await AppIdentityDbContextSeed.SeedUserAsync(userManager, roleManager);
             }
             catch (Exception ex)
             {

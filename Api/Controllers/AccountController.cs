@@ -29,10 +29,18 @@ namespace API.Controllers
         public async Task<ActionResult<UserDTO>> Login(LoginDTO model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null) return Unauthorized(new ApiResponse(401, "Invalid email or password"));
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-            if (!result.Succeeded) return Unauthorized(new ApiResponse(401, "Invalid email or password"));
+            if (user == null)
+                return Unauthorized(new ApiResponse(401, "Invalid email or password"));
+
+            // Soft Delete
+            if (user.IsDeleted)
+                return Unauthorized(new ApiResponse(401, "Account has been deactivated"));
+
+            var checkPassword = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+
+            if (!checkPassword.Succeeded)
+                return Unauthorized(new ApiResponse(401, "Invalid email or password"));
 
             var tokens = await _authService.CreateTokenAsync(user, _userManager);
 
@@ -49,22 +57,27 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO model)
         {
+            if (await _userManager.FindByEmailAsync(model.Email) != null)
+                return BadRequest(new ApiResponse(400, "Email already exists"));
+
             var user = new AppUser
             {
                 DisplayName = model.DisplayName,
                 Email = model.Email,
                 UserName = model.Email.Split('@')[0],
-                UserType = UserType.User
+                UserType = UserType.User,
+                CreatedAt = DateTime.UtcNow
+                
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
-            {
                 return BadRequest(new ApiValidationErrorResponse
                 {
                     Errors = result.Errors.Select(e => e.Description).ToArray()
                 });
-            }
+
+            await _userManager.AddToRoleAsync(user, "User");
 
             var tokens = await _authService.CreateTokenAsync(user, _userManager);
 
@@ -109,9 +122,11 @@ namespace API.Controllers
 
             user.RefreshToken = null;
             user.RefreshTokenExpiryTime = DateTime.MinValue;
-            await _userManager.UpdateAsync(user);
 
-            return Ok();
+            var result = await _userManager.UpdateAsync(user); 
+            if (!result.Succeeded)
+                return BadRequest(new ApiResponse(400, "Logout failed"));
+            return Ok(new ApiResponse(200, "Logged out successfully")); 
         }
 
     }

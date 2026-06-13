@@ -1,4 +1,5 @@
 ﻿using Core.Entities.Identity;
+using Core.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -17,7 +18,7 @@ namespace Repository.Data.Identity
             // تحويل UserType enum إلى string أو int في قاعدة البيانات
             builder.Entity<AppUser>()
                    .Property(u => u.UserType)
-                   .HasConversion(new EnumToStringConverter<Core.Enums.UserType>());
+                   .HasConversion(new EnumToStringConverter<UserType>());
         }
     }
 }

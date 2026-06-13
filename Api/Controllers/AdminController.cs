@@ -11,95 +11,65 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
+using Service;
 using System.Security.Claims;
 
 namespace API.Controllers
 {
     public class AdimnController : BaseApiController
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IAdminService _adminService;
         private readonly IMapper _mapper;
 
-        public AdimnController(UserManager<AppUser> userManager,IMapper mapper )
+        public AdimnController(IAdminService adminService, IMapper mapper )
         {
-            _userManager = userManager;
+            _adminService = adminService;
             _mapper = mapper;
         }
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
         [Authorize(Roles = "Admin")]
         [HttpGet("GetUsers_Active")]
-        public async Task<ActionResult<UserDTO>> GetUsers_Active()
+        public async Task<ActionResult<IReadOnlyList<UserResponseDTO>>> GetActiveUsers()
         {
-            var users = await _userManager.Users.Where(X =>X.IsDeleted == false).ToListAsync();
-            var  mapUser = _mapper.Map<List<UserResponseDTO>>(users);
-            return Ok(mapUser);
+            var users = await _adminService.GetActiveUsersAsync();
+            return Ok(_mapper.Map<IReadOnlyList<UserResponseDTO>>(users));
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")] 
         [HttpGet("GetUsers_NotActive")]
-        public async Task<ActionResult<UserDTO>> GetUsers_NotActive()
+        public async Task<ActionResult<IReadOnlyList<UserResponseDTO>>> GetDeletedUsers()
         {
-            var users = await _userManager.Users.Where(X => X.IsDeleted == true).ToListAsync();
-            var mapUser = _mapper.Map<List<UserResponseDTO>>(users);
-            return Ok(mapUser);
+            var users = await _adminService.GetDeletedUsersAsync();
+            return Ok(_mapper.Map<IReadOnlyList<UserResponseDTO>>(users));
         }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
+        [Authorize(Roles = "Admin")] 
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var userExists = await _userManager.FindByEmailAsync(model.Email);
-            if (userExists != null) 
-            return BadRequest(new ApiResponse(400, "User already exists"));
+            var data = await _adminService.CreateUserAsync(
+                model.Email, model.DisplayName, model.Password, model.UserType);
 
+            if (!data.Success)
+                return BadRequest(new ApiResponse(400, data.Message));
 
-            var user = new AppUser
-            {
-                Email = model.Email,
-                UserName = model.Email,
-                DisplayName = model.DisplayName,
-                UserType = model.UserType,
-                CreatedAt = DateTime.UtcNow,
-                IsDeleted = false
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (!result.Succeeded)
-                return BadRequest(new ApiResponse(400, "Erorr while Create User"));
-
-            // Assign Role
-            await _userManager.AddToRoleAsync(user, model.UserType.ToString());
-
-            return Ok(new
-            {
-                message = "User created successfully",
-                userId = user.Id
-            });
+            return Ok(new ApiResponse(201, data.Message));
         }
-
-
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Authorize(Roles = "Admin")]
         [HttpDelete("DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser( string id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = await _userManager.FindByIdAsync(id); 
-            if (user == null)
-                return NotFound(new ApiResponse(404, "User not found"));
+            var data = await _adminService.DeleteUserAsync(id);
 
-            user.IsDeleted = true;
-            var result = await _userManager.UpdateAsync(user);
+            if (!data.Success)
+                return NotFound(new ApiResponse(404, data.Message));
 
-            if (!result.Succeeded)
-                return BadRequest(new ApiResponse(400, "Erorr while deleting"));
-
-            return Ok(new ApiResponse(200, "User deleted successfully"));
+            return Ok(new ApiResponse(200, data.Message));
         }
-
     }
 }

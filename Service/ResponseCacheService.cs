@@ -29,5 +29,9 @@ namespace Service
             if (cachedResponse.IsNullOrEmpty) return null;
             return cachedResponse;
         }
+        public async Task RemoveCacheAsync(string CacheKey)
+        {
+            await _database.KeyDeleteAsync(CacheKey);
+        }
     }
 }

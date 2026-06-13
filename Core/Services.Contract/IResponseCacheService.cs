@@ -12,5 +12,7 @@ namespace Core.Services.Contract
         Task CacheResponseAsync(string CacheKey, object Response, TimeSpan ExpireTime);
         // Get Cache Data 
         Task<string> GetCachedResponseAsync(string CacheKeycacheKey);
+        // Remove Cache 
+        Task RemoveCacheAsync(string CacheKey);
     }
 }

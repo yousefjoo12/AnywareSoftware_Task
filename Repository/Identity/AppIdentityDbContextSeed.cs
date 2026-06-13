@@ -15,14 +15,14 @@ namespace Project.Repository.Data.Identity
             if (!await _roleManager.RoleExistsAsync("User"))
                 await _roleManager.CreateAsync(new IdentityRole("User"));
 
-
-            if (_userManager.Users.Count() == 0)
+            //*********************************************************
+            if (await _userManager.FindByEmailAsync("Admin@example.com") == null)
             {
                 var user = new AppUser()
                 {
                     DisplayName = "Admin",
-                    UserName = "admin@example.com",
-                    Email = "admin@example.com",
+                    UserName = "Admin@example.com",
+                    Email = "Admin@example.com",
                     UserType = UserType.Admin,
                     CreatedAt = DateTime.UtcNow,
                     RefreshTokenExpiryTime = DateTime.MinValue, 
@@ -32,6 +32,44 @@ namespace Project.Repository.Data.Identity
 
                 if (result.Succeeded)
                     await _userManager.AddToRoleAsync(user, "Admin");
+            }
+            //*********************************************************
+            if (await _userManager.FindByEmailAsync("Yousef@example.com") == null)
+            {
+                var user = new AppUser
+                {
+                    DisplayName = "Yousef Ayman",
+                    UserName = "Yousef@example.com",
+                    Email = "Yousef@example.com",
+                    UserType = UserType.User,
+                    CreatedAt = DateTime.UtcNow,
+                    RefreshTokenExpiryTime = DateTime.MinValue,
+                    IsDeleted = false
+                };
+
+                var result = await _userManager.CreateAsync(user, "Yousef@123");
+
+                if (result.Succeeded)
+                    await _userManager.AddToRoleAsync(user, "User");
+            }
+            //*********************************************************
+            if (await _userManager.FindByEmailAsync("Salam@example.com") == null)
+            {
+                var user = new AppUser
+                {
+                    DisplayName = "Salam Mohmed",
+                    UserName = "Salam@example.com",
+                    Email = "Salam@example.com",
+                    UserType = UserType.User,
+                    CreatedAt = DateTime.UtcNow,
+                    RefreshTokenExpiryTime = DateTime.MinValue,
+                    IsDeleted = false
+                };
+
+                var result = await _userManager.CreateAsync(user, "Salam@123");
+
+                if (result.Succeeded)
+                    await _userManager.AddToRoleAsync(user, "User");
             }
         }
     }

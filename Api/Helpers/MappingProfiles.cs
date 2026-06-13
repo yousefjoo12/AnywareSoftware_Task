@@ -1,4 +1,5 @@
-﻿using API.DTOs;
+﻿using Api.DTOs;
+using API.DTOs;
 using API.DTOs.Identity;
 using AutoMapper;
 using Core.Entities;
@@ -10,7 +11,8 @@ namespace API.Helpers
     {
         public MappingProfiles()
         {
-            CreateMap<AppUser, UserResponseDTO>(); 
+            CreateMap<AppUser, UserResponseDTO>();
+            CreateMap<Tasks, TaskResponseDTO>();
         }
     }
 }

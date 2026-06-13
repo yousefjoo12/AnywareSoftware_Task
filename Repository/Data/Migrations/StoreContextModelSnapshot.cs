@@ -22,7 +22,7 @@ namespace Repository.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Entities.TaskItem", b =>
+            modelBuilder.Entity("Core.Entities.Tasks", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -55,7 +55,7 @@ namespace Repository.Data.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("TaskItem");
+                    b.ToTable("Tasks");
                 });
 #pragma warning restore 612, 618
         }

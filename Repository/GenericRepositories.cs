@@ -2,6 +2,7 @@
 using Core.Repositories.Contract; 
 using Microsoft.EntityFrameworkCore;
 using Repository.Data;
+using System.Linq.Expressions;
 
 namespace Repository
 {
@@ -19,6 +20,14 @@ namespace Repository
         public async Task<T?> GetById(int id)
         {
             return await _dbcontext.Set<T>().FindAsync(id);
+        }
+        public async Task<T?> GetById(string userid)
+        {
+            return await _dbcontext.Set<T>().FindAsync(userid);
+        }
+        public async Task<IReadOnlyList<T>> GetAllWithFilterAsync(Expression<Func<T, bool>> filter)
+        {
+            return await _dbcontext.Set<T>().Where(filter).ToListAsync();
         }
         public async Task<T> AddAsync(T entity)
         {

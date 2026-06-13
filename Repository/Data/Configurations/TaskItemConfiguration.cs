@@ -12,9 +12,9 @@ using System.Threading.Tasks;
 
 namespace Repository.Data.Configurations
 {
-    public class TaskItemConfiguration : IEntityTypeConfiguration<TaskItem>
+    public class TasksConfiguration : IEntityTypeConfiguration<Tasks>
     {
-        public void Configure(EntityTypeBuilder<TaskItem> builder)
+        public void Configure(EntityTypeBuilder<Tasks> builder)
         {
 
             builder.Property(t => t.Status)

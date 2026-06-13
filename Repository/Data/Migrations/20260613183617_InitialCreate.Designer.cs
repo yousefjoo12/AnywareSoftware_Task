@@ -12,7 +12,7 @@ using Repository.Data;
 namespace Repository.Data.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20260613010355_InitialCreate")]
+    [Migration("20260613183617_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -25,7 +25,7 @@ namespace Repository.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Core.Entities.TaskItem", b =>
+            modelBuilder.Entity("Core.Entities.Tasks", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -58,7 +58,7 @@ namespace Repository.Data.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("TaskItem");
+                    b.ToTable("Tasks");
                 });
 #pragma warning restore 612, 618
         }

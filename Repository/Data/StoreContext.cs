@@ -22,6 +22,7 @@ namespace Repository.Data
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<Tasks> Tasks { get; set; }
 
     }
 }

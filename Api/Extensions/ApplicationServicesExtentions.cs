@@ -16,6 +16,8 @@ namespace API.Extensions
             services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork));
             services.AddScoped(typeof(IAuthService), typeof(AuthService)); 
             services.AddScoped(typeof(IAdminService), typeof(AdminService)); 
+            services.AddScoped(typeof(ITaskService), typeof(TaskService)); 
+            services.AddScoped(typeof(IResponseCacheService), typeof(ResponseCacheService)); 
             services.AddAutoMapper(typeof(MappingProfiles)); 
 
 

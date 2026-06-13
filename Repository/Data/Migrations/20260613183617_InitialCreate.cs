@@ -12,7 +12,7 @@ namespace Repository.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "TaskItem",
+                name: "Tasks",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
@@ -26,7 +26,7 @@ namespace Repository.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TaskItem", x => x.ID);
+                    table.PrimaryKey("PK_Tasks", x => x.ID);
                 });
         }
 
@@ -34,7 +34,7 @@ namespace Repository.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "TaskItem");
+                name: "Tasks");
         }
     }
 }

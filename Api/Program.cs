@@ -123,7 +123,7 @@ namespace API
             {
                 await dbContext.Database.MigrateAsync();
                 await identityDbContext.Database.MigrateAsync();
-                await StoreContextSeed.SeedAsync(dbContext);
+                await StoreContextSeed.SeedAsync(dbContext, userManager);
                 await AppIdentityDbContextSeed.SeedUserAsync(userManager, roleManager);
             }
             catch (Exception ex)

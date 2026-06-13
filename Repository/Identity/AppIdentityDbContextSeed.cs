@@ -53,20 +53,20 @@ namespace Project.Repository.Data.Identity
                     await _userManager.AddToRoleAsync(user, "User");
             }
             //*********************************************************
-            if (await _userManager.FindByEmailAsync("Salam@example.com") == null)
+            if (await _userManager.FindByEmailAsync("Salma@example.com") == null)
             {
                 var user = new AppUser
                 {
-                    DisplayName = "Salam Mohmed",
-                    UserName = "Salam@example.com",
-                    Email = "Salam@example.com",
+                    DisplayName = "Salma Mohmed",
+                    UserName = "Salma@example.com",
+                    Email = "Salma@example.com",
                     UserType = UserType.User,
                     CreatedAt = DateTime.UtcNow,
                     RefreshTokenExpiryTime = DateTime.MinValue,
                     IsDeleted = false
                 };
 
-                var result = await _userManager.CreateAsync(user, "Salam@123");
+                var result = await _userManager.CreateAsync(user, "Salma@123");
 
                 if (result.Succeeded)
                     await _userManager.AddToRoleAsync(user, "User");

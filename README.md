@@ -117,7 +117,6 @@ TaskManagement/
 │   ├── AuthService.cs
 │   ├── AdminService.cs
 │   ├── TaskService.cs
-│   ├── TaskQueue.cs
 │   └── ResponseCacheService.cs
 ├── Repository/              → Data Access
 │   ├── Data/
@@ -130,8 +129,7 @@ TaskManagement/
     ├── Controllers/
     ├── DTOs/
     ├── Helpers/
-    ├── Middleware/
-    └── BackgroundServices/
+    └── Middleware/
 
 ---
 

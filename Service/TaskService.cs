@@ -1,19 +1,23 @@
 ﻿using Core;
 using Core.Entities;
+using Core.Entities.Identity;
 using Core.Enums;
 using Core.Services.Contract;
+using Microsoft.AspNetCore.Identity;
 
 namespace Service
 {
     public class TaskService : ITaskService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<AppUser> _userManager;
 
-        public TaskService(IUnitOfWork unitOfWork)
+        public TaskService(IUnitOfWork unitOfWork, UserManager<AppUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
-         
+
         public async Task<IReadOnlyList<Tasks>> GetUserTasksAsync(string userId)
         {
             var tasks = await _unitOfWork.Repository<Tasks>().GetAllWithFilterAsync(t => t.UserId == userId);
@@ -35,7 +39,7 @@ namespace Service
         }
 
         public async Task<(bool Success, string Message, Tasks? Task)> CreateTaskAsync(string title, string description, Priority priority, string userId)
-        { 
+        {
             var today = DateTime.UtcNow.Date;
 
             var existing = await _unitOfWork.Repository<Tasks>().GetAllWithFilterAsync(T => T.UserId == userId && T.Title.ToLower() == title.ToLower() && T.CreatedAt.Date == today);
@@ -43,6 +47,7 @@ namespace Service
             if (existing.Any())
                 return (false, "Task with same title already exists today", null);
 
+            var user = await _userManager.FindByIdAsync(userId);
             var task = new Tasks
             {
                 Title = title,
@@ -50,6 +55,7 @@ namespace Service
                 Priority = priority,
                 Status = Status.Pending,
                 UserId = userId,
+                UserName = user.UserName ?? "",
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -72,6 +78,6 @@ namespace Service
             await _unitOfWork.CompleteAsync();
 
             return (true, "Status updated successfully");
-        } 
+        }
     }
 }

@@ -16,6 +16,8 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Roles = "Admin")]
     public class AdimnController : BaseApiController
     {
         private readonly IAdminService _adminService;
@@ -25,26 +27,21 @@ namespace API.Controllers
         {
             _adminService = adminService;
             _mapper = mapper;
-        }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
-        [Authorize(Roles = "Admin")]
+        } 
         [HttpGet("GetUsers_Active")]
         public async Task<ActionResult<IReadOnlyList<UserResponseDTO>>> GetActiveUsers()
         {
             var users = await _adminService.GetActiveUsersAsync();
             return Ok(_mapper.Map<IReadOnlyList<UserResponseDTO>>(users));
         }
-
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin")] 
+          
         [HttpGet("GetUsers_NotActive")]
         public async Task<ActionResult<IReadOnlyList<UserResponseDTO>>> GetDeletedUsers()
         {
             var users = await _adminService.GetDeletedUsersAsync();
             return Ok(_mapper.Map<IReadOnlyList<UserResponseDTO>>(users));
-        }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] 
-        [Authorize(Roles = "Admin")] 
+        } 
+       
         [HttpPost("CreateUser")]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDTO model)
         {
@@ -58,9 +55,7 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse(400, data.Message));
 
             return Ok(new ApiResponse(201, data.Message));
-        }
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Authorize(Roles = "Admin")]
+        }  
         [HttpDelete("DeleteUser/{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {

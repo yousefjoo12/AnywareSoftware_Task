@@ -53,7 +53,20 @@ namespace API.Controllers
                 RefreshToken = tokens.RefreshToken
             });
         }
+        [HttpGet("me")]
+        public async Task<ActionResult<UserDTO>> GetCurrentUser()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null) return NotFound(new ApiResponse(404, "User not found"));
 
+            return Ok(new UserDTO
+            {
+                DisplayName = user.DisplayName,
+                Email = user.Email,
+                UserType = user.UserType.ToString()
+            });
+        }
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register(RegisterDTO model)
         {

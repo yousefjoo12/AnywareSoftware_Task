@@ -8,7 +8,6 @@
 - Redis Caching
 - Swagger / OpenAPI
 - AutoMapper
-- .NET BackgroundService
 
 ---
 
